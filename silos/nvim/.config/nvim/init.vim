@@ -2,7 +2,7 @@ let $VIM        = expand('~/.config/nvim/')
 let $TMP        = expand($VIM . 'tmp/')
 let $BUNDLES    = expand($VIM . 'bundle/')
 
-let g:author = 'Adam Rutkowski <hq@mtod.org>'
+let g:author = 'Maciek Wcislik <maciekwcislik@gmail.com>'
 
 if !isdirectory($TMP)
   call mkdir($TMP, "p")
@@ -88,7 +88,7 @@ let g:syntastic_auto_loc_list = 1
 let g:tslime_ensure_trailing_newlines = 1
 let g:vim_markdown_folding_disabled = 1
 
-let mapleader=" "
+let mapleader=","
 nnoremap <leader><space> :Commands<CR>
 set shell=/bin/zsh
 
@@ -361,7 +361,7 @@ augroup elixir
     autocmd!
     let g:UltiSnipsJumpForwardTrigger='<tab>'
     let g:syntastic_enable_elixir_checker = 0
-    autocmd FileType elixir setlocal tags+=/Users/hq1/dev/elixir/tags
+    autocmd FileType elixir setlocal tags+=/Users/inout/dev/elixir/tags
 
     autocmd FileType eelixir setlocal textwidth=0
     autocmd FileType eelixir setlocal wrapmargin=0
