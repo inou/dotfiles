@@ -205,7 +205,7 @@ bindkey '^N' down-line-or-search
 ### syntaxt highlighting {{{
 [[ -e $ZSH_SYNTAX_HIGHLIGHTING ]] && source $ZSH_SYNTAX_HIGLIGHTING
 ### }}}
-export PATH=$PATH:/Users/hq1/bin
+export PATH=$PATH:/Users/inou/bin
 export PATH=/usr/local/bin:$PATH
 
 load-local-conf() {
@@ -215,7 +215,7 @@ load-local-conf() {
 }
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-source /Users/hq1/.rvm/scripts/rvm
+source /Users/inou/.rvm/scripts/rvm
 export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/9.4/bin
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
