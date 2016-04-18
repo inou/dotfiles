@@ -1,6 +1,6 @@
 [user]
-    email = hq@mtod.org
-    name = Adam Rutkowski
+    email = maciekwcislik@gmail.com
+    name = Maciek Wcislik
 [color]
     ui = true
 [alias]
@@ -16,7 +16,7 @@
     amend = commit --amend
     unpushed = cherry -v
 [github]
-    user = aerosol
+    user = inou
 [help]
     autocorrect = 1
 [pull]
