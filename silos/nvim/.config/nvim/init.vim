@@ -1,12 +1,14 @@
 let $VIM        = expand('~/.config/nvim/')
 let $TMP        = expand($VIM . 'tmp/')
 let $BUNDLES    = expand($VIM . 'bundle/')
+let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
 
 let g:author = 'Maciek Wcislik <maciekwcislik@gmail.com>'
 
 if !isdirectory($TMP)
   call mkdir($TMP, "p")
 endif
+
 
 call plug#begin($BUNDLES)
 Plug 'ElmCast/elm-vim', {'for': 'elm'}
@@ -58,14 +60,20 @@ Plug 'w0ng/vim-hybrid'
 Plug 'wellle/tmux-complete.vim'
 Plug 'zhaocai/GoldenView.Vim'
 Plug 'tmux-plugins/vim-tmux'
-
 Plug 'jreybert/vimagit', {'branch': 'next'}
 Plug 'ludovicchabant/vim-gutentags'
+Plug 'rizzatti/dash.vim'
+Plug 'honza/vim-snippets'
+Plug 'rking/ag.vim'
+Plug 'mattn/emmet-vim'
+Plug 'ctjhoa/spacevim'
+Plug 'joshdick/onedark.vim'
 call plug#end()
 
 "let g:ref_cache_dir = expand($TMP . '/vim_ref_cache/')
 "let g:ref_open = 'split'
 "let g:ref_use_vimproc = 1
+let g:netrw_winsize = 25
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 let g:SuperTabCrMapping = 1
 let g:SuperTabDefaultCompletionType = "context"
@@ -84,21 +92,30 @@ let g:signify_mapping_prev_hunk = '[c'
 let g:signify_skip_filetype = { 'vim': 1, 'diff': 1 }
 let g:signify_update_on_focusgained = 1
 let g:sql_type_default = 'pgsql'
+let g:syntastic_always_populate_loc_list =1
 let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
 let g:tslime_ensure_trailing_newlines = 1
 let g:vim_markdown_folding_disabled = 1
+let g:UltiSnipsSnippetsDir="~/.config/nvim/snippets/"
 
 let mapleader=","
 nnoremap <leader><space> :Commands<CR>
-set shell=/bin/zsh
+nnoremap <leader>x :Explore<CR>
 
-set background=dark
-colorscheme hybrid
+set shell=/usr/local/bin/zsh
 
 syntax on
 syntax sync minlines=256
 filetype plugin indent on
 filetype on
+
+let g:hybrid_custom_term_colors = 1
+let g:hybrid_reduced_contrast = 1
+set background=dark
+colorscheme onedark
+
 
 inoremap jk <Esc>
 
@@ -125,7 +142,7 @@ set splitright
 
 set expandtab
 set shiftwidth=2
-set softtabstop=2
+set softtabstop=4
 set tabstop=4
 
 set textwidth=79
@@ -200,9 +217,6 @@ set colorcolumn=80
 nnoremap H gT
 nnoremap L gt
 
-nnoremap 0 ^
-nnoremap ^ 0
-
 cnoremap <C-a> <home>
 cnoremap <C-e> <end>
 cnoremap <C-f> <right>
@@ -218,8 +232,8 @@ nnoremap <silent> <C-l> <C-w>l
 nnoremap <leader>bd :bdelete<CR>
 nnoremap <leader>bD :call delete(expand('%'))<CR>:bdelete!<CR>
 
-nnoremap <silent> <C-w>\| <C-W>v
-nnoremap <silent> <C-w>- <C-W>s
+nnoremap <silent> <leader>\| <C-W>v
+nnoremap <silent> <leader>- <C-W>s
 
 nnoremap <leader>r :%s/\<<C-r><C-w>\>/
 
@@ -314,6 +328,7 @@ augroup erlang
     endfunction
     autocmd FileType erlang call s:erlang_settings()
     autocmd BufNewFile,BufRead *.app.src,rebar.config,sys.config setl filetype=erlang
+    nnoremap <leader>ea vip:EasyAlign /::/ dr<CR>
 augroup END
 
 augroup spell
@@ -373,8 +388,12 @@ augroup elixir
     autocmd BufWritePost *.exs Neomake
 
     let g:neomake_elixir_test_maker = {
-            \ 'exe': 'mix',
-            \ 'args': ['test'],
+            \ 'exe': 'elixirc',
+            \ 'args': [
+            \ '--ignore-module-conflict', '--warning-as-errors',
+            \ '--app', 'mix', '--app', 'ex_unit',
+            \ '-o', '$TMPDIR', '%:p'
+            \],
             \ 'errorformat':
                 \ '%Z       %f:%l,' .
                 \ '%C     ** %m,' .
@@ -411,6 +430,7 @@ augroup elm
     let g:elm_make_show_warnings = 0
     let g:elm_browser_command = ""
     let g:elm_detailed_complete = 0
+    let g:elm_format_autosave = 1
 augroup END
 
 augroup autoroot
@@ -460,3 +480,22 @@ nmap ga <Plug>(EasyAlign)
 nnoremap <C-P> @:
 
 set diffopt+=foldcolumn:0
+
+fu! GenerateUUID()
+
+python << EOF
+import uuid
+import vim
+
+# output a uuid to the vim variable for insertion below
+vim.command("let generatedUUID = \"%s\"" % str(uuid.uuid4()))
+
+EOF
+
+" insert the python generated uuid into the current cursor's position
+:execute "normal i" . generatedUUID . ""
+
+endfunction
+
+"initialize the generateUUID function here and map it to a local command
+noremap <leader>4 :call GenerateUUID()<CR>
