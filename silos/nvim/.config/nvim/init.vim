@@ -12,7 +12,8 @@ endif
 
 call plug#begin($BUNDLES)
 Plug 'ElmCast/elm-vim', {'for': 'elm'}
-Plug 'Shougo/deoplete.nvim'
+"Plug 'Shougo/deoplete.nvim'
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'SirVer/ultisnips'
 Plug 'airblade/vim-rooter'
 Plug 'benekastah/neomake'
@@ -36,6 +37,8 @@ Plug 'mhinz/vim-signify'
 Plug 'plasticboy/vim-markdown'
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/syntastic'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'sjl/tslime.vim'
 Plug 'slashmili/alchemist.vim'
 Plug 'stephpy/vim-yaml'
@@ -50,6 +53,8 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat', {'for': 'clojure'}
 Plug 'tpope/vim-sexp-mappings-for-regular-people', {'for': 'clojure'}
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-db'
+Plug 'tpope/vim-commentary'
 Plug 'venantius/vim-cljfmt', {'for': 'clojure'}
 Plug 'vim-erlang/erlang-motions.vim', {'for': 'erlang'}
 Plug 'vim-erlang/vim-erlang-compiler', {'for': 'erlang'}
@@ -68,17 +73,23 @@ Plug 'rking/ag.vim'
 Plug 'mattn/emmet-vim'
 Plug 'ctjhoa/spacevim'
 Plug 'joshdick/onedark.vim'
+Plug 'Shougo/vinarise.vim'
+Plug 'baverman/vial'
+Plug 'baverman/vial-http'
+Plug 'Olical/vim-enmasse'
+Plug 'rust-lang/rust.vim'
+Plug 'dracula/vim',{'as':'dracula'}
 call plug#end()
 
 "let g:ref_cache_dir = expand($TMP . '/vim_ref_cache/')
 "let g:ref_open = 'split'
 "let g:ref_use_vimproc = 1
-let g:netrw_winsize = 25
+"let g:netrw_winsize = 25
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 let g:SuperTabCrMapping = 1
 let g:SuperTabDefaultCompletionType = "context"
-let g:deoplete#auto_complete_start_length = 1
-let g:deoplete#enable_at_startup = 1
+"let g:deoplete#auto_complete_start_length = 1
+"let g:deoplete#enable_at_startup = 1
 let g:erlang_tags_ignore = '_rel'
 let g:filebeagle_show_hidden=1
 let g:gist_clip_command = 'pbcopy'
@@ -86,6 +97,7 @@ let g:gist_detect_filetype = 1
 let g:gist_open_browser_after_post = 1
 let g:gist_post_private = 1
 let g:goldenview__enable_default_mapping = 0
+let g:goldenview__enable_at_startup = 0
 let g:signify_line_highlight = 0
 let g:signify_mapping_next_hunk = ']c'
 let g:signify_mapping_prev_hunk = '[c'
@@ -99,10 +111,14 @@ let g:syntastic_check_on_wq = 0
 let g:tslime_ensure_trailing_newlines = 1
 let g:vim_markdown_folding_disabled = 1
 let g:UltiSnipsSnippetsDir="~/.config/nvim/snippets/"
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger='<tab>'
+let g:UltiSnipsJumpBackwardTrigger='<s-tab>'
+let g:NERDTreeWinSize = 31
 
 let mapleader=","
 nnoremap <leader><space> :Commands<CR>
-nnoremap <leader>x :Explore<CR>
+map <leader>x :NERDTreeToggle<CR>
 
 set shell=/usr/local/bin/zsh
 
@@ -115,6 +131,7 @@ let g:hybrid_custom_term_colors = 1
 let g:hybrid_reduced_contrast = 1
 set background=dark
 colorscheme onedark
+color dracula
 
 
 inoremap jk <Esc>
@@ -183,7 +200,11 @@ set statusline +=%3v\ %*  " virtual column number
 set statusline +=%#search#%{fugitive#head()}%*
 set statusline +=\ %y%*   " file type
 
+autocmd vimenter * NERDTree
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 autocmd InsertLeave,BufWritePost * unlet! b:statusline_trailing_space_warning
+
 
 function! StatuslineTrailingSpaceWarning()
   if !exists("b:statusline_trailing_space_warning")
@@ -351,30 +372,8 @@ augroup git
     autocmd FileType gitcommit nmap <buffer> k <C-p>
 augroup END
 
-augroup clj
-    autocmd!
-    autocmd FileType clojure setlocal shiftwidth=2
-    autocmd FileType clojure nnoremap <C-c><C-r> :Require<CR>
-    autocmd FileType clojure nnoremap <C-c><C-e> :Eval<CR>
-    autocmd FileType clojure nnoremap <C-c><C-p> :Eval!<CR>
-
-    let g:wildfire_objects = ["i'", "a'", 'i"', 'a"', "i)", "a)", "i]", "a]", "i}", "ip", "it"]
-
-    function! ClojureContext()
-        let curline = getline('.')
-        let cnum = col('.')
-        let synname = synIDattr(synID(line('.'), cnum - 1, 1), 'name')
-        if curline =~ '(\S\+\%' . cnum . 'c' && synname !~ '\(String\|Comment\)'
-            return "\<c-x>\<c-o>"
-        endif
-    endfunction
-
-    autocmd FileType clojure let b:SuperTabCompletionContexts = ['ClojureContext']
-augroup END
-
 augroup elixir
     autocmd!
-    let g:UltiSnipsJumpForwardTrigger='<tab>'
     let g:syntastic_enable_elixir_checker = 0
     autocmd FileType elixir setlocal tags+=/Users/inout/dev/elixir/tags
 
@@ -431,6 +430,7 @@ augroup elm
     let g:elm_browser_command = ""
     let g:elm_detailed_complete = 0
     let g:elm_format_autosave = 1
+    let g:elm_syntastic_show_warnings = 1
 augroup END
 
 augroup autoroot
@@ -463,6 +463,7 @@ imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
+nmap ; :Buffers<CR>
 nnoremap <leader>pf :FZF<CR>
 nnoremap <leader>pt :Tags<CR>
 nnoremap <leader>bc :BCommits<CR>
